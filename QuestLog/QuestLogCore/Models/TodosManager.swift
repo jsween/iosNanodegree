@@ -14,7 +14,7 @@ public class TodosManager {
     public init() {}
 
     /// Adds a new todo (quest item) with the given title
-    public func add(title: String) {
+    public func addTodo(title: String) {
         let todo = Todo(title: title)
         todos.append(todo)
     }
@@ -25,7 +25,7 @@ public class TodosManager {
     }
 
     /// Fetches all todos (quests)
-    public func fetchAll() -> [Todo]{
+    public func fetchAll() -> [Todo] {
         return todos
     }
 
@@ -36,7 +36,7 @@ public class TodosManager {
     }
 
     /// Delete a todo item by its ID
-    public func delete(id: UUID) {
+    public func deleteBy(id: UUID) {
         todos.removeAll(where: { $0.id == id })
     }
 
