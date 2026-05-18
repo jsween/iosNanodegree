@@ -7,5 +7,7 @@
 
 import Foundation
 
-print("Hello, World!")
+var todoItem = Todo(title: "Test Title")
+
+print(todoItem.title)
 
