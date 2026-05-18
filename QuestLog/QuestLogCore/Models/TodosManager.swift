@@ -9,7 +9,7 @@ import Foundation
 
 /// Manages the collection of todos (quests), including adding, listing, toggling, and deleting.
 public class TodosManager {
-    public var todos: [Todo] = []
+    private var todos: [Todo] = []
 
     public init() {}
 
@@ -17,6 +17,11 @@ public class TodosManager {
     public func add(title: String) {
         let todo = Todo(title: title)
         todos.append(todo)
+    }
+
+    /// Fetches a todo (quest) by its ID or nil if not found
+    public func fetchBy(id: UUID) -> Todo? {
+        return todos.first(where: { $0.id == id })
     }
 
     /// Fetches all todos (quests)
