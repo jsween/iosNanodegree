@@ -8,7 +8,7 @@
 import Foundation
 
 /// A single todo item with a unique ID, tiltle, and completion status
-public struct Todo {
+public struct Todo: Equatable {
     public let id: UUID = UUID()
     public var title: String
     public var isDone: Bool = false
