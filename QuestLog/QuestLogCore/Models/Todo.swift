@@ -8,8 +8,12 @@
 import Foundation
 
 /// A single todo item with a unique ID, tiltle, and completion status
-struct Todo {
-    let id: UUID = UUID()
-    var title: String
-    var isDone: Bool = false
+public struct Todo {
+    public let id: UUID = UUID()
+    public var title: String
+    public var isDone: Bool = false
+
+    public init(title: String) {
+        self.title = title.capitalized
+    }
 }

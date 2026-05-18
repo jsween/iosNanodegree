@@ -58,23 +58,6 @@
 		B70651092FBBC4F800ED4409 /* QuestLogCoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QuestLogCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		B70651162FBBC50A00ED4409 /* Exceptions for "QuestLogCore" folder in "QuestLog" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Models/Todo.swift,
-			);
-			target = B70650EC2FBAA08300ED4409 /* QuestLog */;
-		};
-		B70651172FBBC50A00ED4409 /* Exceptions for "QuestLogCore" folder in "QuestLogCore" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Models/Todo.swift,
-			);
-			target = B70650FE2FBBC4F800ED4409 /* QuestLogCore */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		B70650EF2FBAA08300ED4409 /* QuestLog */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -83,10 +66,6 @@
 		};
 		B70651002FBBC4F800ED4409 /* QuestLogCore */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				B70651162FBBC50A00ED4409 /* Exceptions for "QuestLogCore" folder in "QuestLog" target */,
-				B70651172FBBC50A00ED4409 /* Exceptions for "QuestLogCore" folder in "QuestLogCore" target */,
-			);
 			path = QuestLogCore;
 			sourceTree = "<group>";
 		};

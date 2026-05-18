@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import QuestLogCore
 
 var todoItem = Todo(title: "Test Title")
 
