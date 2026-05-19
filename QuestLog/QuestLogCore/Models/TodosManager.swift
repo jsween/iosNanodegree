@@ -10,8 +10,8 @@ import Foundation
 /// Manages the collection of todos (quests), including adding, listing, toggling, and deleting.
 public class TodosManager: Codable {
     private var todos: [Todo] = []
-    public var health: Int = 100
-    
+    public private(set) var health: Int = 100
+
     public init() {}
 
     /// Adds a new todo (quest item) with the given title
@@ -56,8 +56,18 @@ public class TodosManager: Codable {
         todos.remove(at: index)
     }
 
-    /// Delte all todo items
+    /// Delete all todo items
     public func deleteAll() {
         todos.removeAll()
+    }
+
+    /// Apply penalty to incorrect input
+    public func applyPenalty(_ amount: Int) {
+        health = max(0, health - amount)
+    }
+
+    /// Get health status
+    public func getHealth() -> Int {
+        health
     }
 }
