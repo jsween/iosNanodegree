@@ -10,62 +10,73 @@ import Testing
 
 struct TodosManagerTests {
 
-    var tdm = TodosManager()
+    var manager = TodosManager()
 
     @Test func initWithoutTasks() {
-        let allTasks: [Todo] = tdm.listTodos()
+        let allTasks: [Todo] = manager.listTodos()
         #expect(allTasks.isEmpty)
     }
 
     @Test func addingATask() {
-        tdm.add("Task1")
-        #expect(tdm.listTodos().count == 1)
+        manager.add("Task1")
+        #expect(manager.listTodos().count == 1)
     }
 
     @Test func fetchByIdReturnsWhenMatch() {
-        tdm.add("T")
-        let todoItem = tdm.listTodos().first!
+        manager.add("T")
+        let todoItem = manager.listTodos().first!
         let id = todoItem.id
-        let fetchedTodo = tdm.fetchBy(id: id)
+        let fetchedTodo = manager.fetchBy(id: id)
         #expect(todoItem == fetchedTodo)
     }
 
     @Test func fetchByIdReturnsNilWhenNoMatch() {
-        tdm.add("T")
+        manager.add("T")
         let todoItem = Todo(title: "X")
-        let fetchedTodo = tdm.fetchBy(id: todoItem.id)
+        let fetchedTodo = manager.fetchBy(id: todoItem.id)
         #expect(fetchedTodo == nil)
     }
 
     @Test func fetchAllReturnsAllTasks() {
-        tdm.add("Task1")
-        #expect(tdm.listTodos().count == 1)
-        tdm.add("Task2")
-        #expect(tdm.listTodos().count == 2)
-        tdm.add("Task3")
-        #expect(tdm.listTodos().count == 3)
+        manager.add("Task1")
+        #expect(manager.listTodos().count == 1)
+        manager.add("Task2")
+        #expect(manager.listTodos().count == 2)
+        manager.add("Task3")
+        #expect(manager.listTodos().count == 3)
     }
 
     @Test func toggleIsDoneByUuid() {
-        tdm.add("T")
-        var isDone = tdm.toggleCompletion(at: 0)
+        manager.add("T")
+        var isDone = manager.toggleCompletion(at: 0)
         #expect(isDone == true)
-        isDone = tdm.toggleCompletion(at: 0)
+        isDone = manager.toggleCompletion(at: 0)
         #expect(isDone == false)
     }
 
     @Test func deleteByIndex() {
-        tdm.add("T")
-        #expect(tdm.listTodos().count == 1)
-        tdm.deleteTodo(at: 0)
-        #expect(tdm.listTodos().isEmpty)
+        manager.add("T")
+        #expect(manager.listTodos().count == 1)
+        manager.deleteTodo(at: 0)
+        #expect(manager.listTodos().isEmpty)
     }
 
     @Test func deleteAll() {
-        tdm.add("Task1")
-        tdm.add("Task2")
-        tdm.add("Task3")
-        tdm.deleteAll()
-        #expect(tdm.listTodos().count == 0)
+        manager.add("Task1")
+        manager.add("Task2")
+        manager.add("Task3")
+        manager.deleteAll()
+        #expect(manager.listTodos().count == 0)
+    }
+
+    @Test func penaltyReducesHealth() {
+        let initial = manager.getHealth()
+        manager.applyPenalty(10)
+        #expect(manager.getHealth() == initial - 10)
+    }
+
+    @Test func healthFloorIsZero() {
+        manager.applyPenalty(999)
+        #expect(manager.getHealth() == 0)
     }
 }
