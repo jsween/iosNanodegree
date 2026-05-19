@@ -37,14 +37,17 @@ public class TodosManager: Codable {
     }
 
     /// Toggles the completions status of task by its ID
-    public func toggleCompletion(at index: UUID) -> Bool? {
-        guard let idx = todos.firstIndex(where: { $0.id == index }) else { return nil }
-        todos[idx].isDone.toggle()
-        let isDone = todos[idx].isDone
-        let points = Int.random(in: 1...10)
-        health += isDone ? points : -points * 2
+    public func toggleCompletion(at index: Int) -> Bool? {
+        guard index >= 0 && index < todos.count else { return nil }
+        todos[index].isDone.toggle()
+        return todos[index].isDone
+    }
 
-        return isDone
+    /// Returns the dice roll: if critical and amount of points
+    public func applyHealthRoll(isDone: Bool) -> DiceRoll {
+        let roll = DiceRoll.roll2d6()
+        health = max(0, health + (isDone ? roll.total : -roll.total)) // double if critical
+        return roll
     }
 
     /// Delete a todo item by its ID
