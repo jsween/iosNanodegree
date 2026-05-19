@@ -8,9 +8,10 @@
 import Foundation
 
 /// Manages the collection of todos (quests), including adding, listing, toggling, and deleting.
-public class TodosManager {
+public class TodosManager: Codable {
     private var todos: [Todo] = []
-
+    public var health: Int = 100
+    
     public init() {}
 
     /// Adds a new todo (quest item) with the given title
