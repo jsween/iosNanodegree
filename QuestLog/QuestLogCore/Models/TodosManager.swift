@@ -24,6 +24,12 @@ public class TodosManager {
         return todos.first(where: { $0.id == id })
     }
 
+    /// Fetches a todo (quest) by its Index or nil if index is not valid
+    public func fetchBy(index: Int) -> Todo? {
+        guard index >= 0 && index < todos.count else { return nil }
+        return todos[index]
+    }
+
     /// Fetches all todos (quests)
     public func listTodos() -> [Todo] {
         return todos
