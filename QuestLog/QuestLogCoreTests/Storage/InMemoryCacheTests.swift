@@ -12,10 +12,10 @@ struct InMemoryCacheTests {
     let cache = InMemoryCache()
 
     @Test func saveAndLoad() throws {
-        let todos = [Todo(title: "Test")]
-        try cache.save(todos: todos)
+        let state = AppState(todos: [Todo(title: "Test")], health: 100)
+        try cache.save(state: state)
         let loaded = try cache.load()
-        #expect(loaded?.count == 1)
+        #expect(loaded?.todos.count == 1)
     }
 
     @Test func loadReturnsNilWhenEmpty() throws {

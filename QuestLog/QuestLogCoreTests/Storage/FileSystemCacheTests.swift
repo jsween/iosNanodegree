@@ -14,10 +14,10 @@ struct FileSystemCacheTests {
         let cache = FileSystemCache(fileName: "test-saveAndLoad.json")
         defer { try? cache.deleteFile() }
 
-        let todos = [Todo(title: "Test")]
-        try cache.save(todos: todos)
+        let state = AppState(todos: [Todo(title: "Test")], health: 100)
+        try cache.save(state: state)
         let loaded = try cache.load()
-        #expect(loaded?.count == 1)
+        #expect(loaded?.todos.count == 1)
     }
 
     @Test func loadReturnsNilWhenNoFile() throws {
@@ -32,9 +32,9 @@ struct FileSystemCacheTests {
         let cache = FileSystemCache(fileName: "test-savedTodosMatch.json")
         defer { try? cache.deleteFile() }
 
-        let todo = Todo(title: "Slay the dragon")
-        try cache.save(todos: [todo])
+        let state = AppState(todos: [Todo(title: "Slay the dragon")], health: 100)
+        try cache.save(state: state)
         let loaded = try cache.load()
-        #expect(loaded?.first?.title == todo.title)
+        #expect(loaded?.todos.first?.title == state.todos.first?.title)
     }
 }
