@@ -14,7 +14,7 @@ public class TodosManager {
     public init() {}
 
     /// Adds a new todo (quest item) with the given title
-    public func addTodo(title: String) {
+    public func add(_ title: String) {
         let todo = Todo(title: title)
         todos.append(todo)
     }
@@ -25,19 +25,19 @@ public class TodosManager {
     }
 
     /// Fetches all todos (quests)
-    public func fetchAll() -> [Todo] {
+    public func listTodos() -> [Todo] {
         return todos
     }
 
     /// Toggles the completions status of task by its ID
-    public func toggle(id: UUID) {
-        guard let index = todos.firstIndex(where: { $0.id == id }) else { return }
-        todos[index].isDone.toggle()
+    public func toggleCompletion(at index: UUID) {
+        guard let idx = todos.firstIndex(where: { $0.id == index }) else { return }
+        todos[idx].isDone.toggle()
     }
 
     /// Delete a todo item by its ID
-    public func deleteBy(id: UUID) {
-        todos.removeAll(where: { $0.id == id })
+    public func deleteTodo(at index: UUID) {
+        todos.removeAll(where: { $0.id == index })
     }
 
     /// Delte all todo items
