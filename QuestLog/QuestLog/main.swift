@@ -8,7 +8,4 @@
 import Foundation
 import QuestLogCore
 
-var todoItem = Todo(title: "Test Title")
-
-print(todoItem.title)
-
+App().run()
