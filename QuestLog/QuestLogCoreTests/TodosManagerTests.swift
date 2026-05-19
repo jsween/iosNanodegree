@@ -49,12 +49,10 @@ struct TodosManagerTests {
     @Test func toggleIsDoneByUuid() {
         tdm.add("T")
         let todoItem = tdm.listTodos().first!
-        tdm.toggleCompletion(at: todoItem.id)
-        var updated = tdm.fetchBy(id: todoItem.id)
-        #expect(updated?.isDone == true)
-        tdm.toggleCompletion(at: todoItem.id)
-        updated = tdm.fetchBy(id: todoItem.id)
-        #expect(updated?.isDone == false)
+        var isDone = tdm.toggleCompletion(at: todoItem.id)
+        #expect(isDone == true)
+        isDone = tdm.toggleCompletion(at: todoItem.id)
+        #expect(isDone == false)
     }
 
     @Test func deleteById() {
