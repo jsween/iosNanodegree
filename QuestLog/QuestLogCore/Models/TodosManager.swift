@@ -8,16 +8,25 @@
 import Foundation
 
 /// Manages the collection of todos (quests), including adding, listing, toggling, and deleting.
-public class TodosManager: Codable {
-    private var todos: [Todo] = []
+public class TodosManager {
+    private var todos: [Todo]
     public private(set) var health: Int = 100
+    private let cache: Cache
 
-    public init() {}
+    public init(cache: Cache = FileSystemCache()) {
+        self.cache = cache
+        self.todos = (try? cache.load()) ?? []
+    }
+
+    /// Persist cached todo items helper
+    public func persist() {
+        try? cache.save(todos: todos)
+    }
 
     /// Adds a new todo (quest item) with the given title
     public func add(_ title: String) {
-        let todo = Todo(title: title)
-        todos.append(todo)
+        todos.append(Todo(title: title))
+        persist()
     }
 
     /// Fetches a todo (quest) by its ID or nil if not found
@@ -40,6 +49,7 @@ public class TodosManager: Codable {
     public func toggleCompletion(at index: Int) -> Bool? {
         guard index >= 0 && index < todos.count else { return nil }
         todos[index].isDone.toggle()
+        persist()
         return todos[index].isDone
     }
 
@@ -54,11 +64,13 @@ public class TodosManager: Codable {
     public func deleteTodo(at index: Int) {
         guard index >= 0 && index < todos.count else { return }
         todos.remove(at: index)
+        persist()
     }
 
     /// Delete all todo items
     public func deleteAll() {
         todos.removeAll()
+        persist()
     }
 
     /// Apply penalty to incorrect input
