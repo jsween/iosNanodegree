@@ -54,11 +54,11 @@ struct TodosManagerTests {
         #expect(isDone == false)
     }
 
-    @Test func deleteById() {
+    @Test func deleteByIndex() {
         tdm.add("T")
-        let todoItem = tdm.listTodos().first!
-        tdm.deleteTodo(at: todoItem.id)
-        #expect(tdm.fetchBy(id: todoItem.id) == nil)
+        #expect(tdm.listTodos().count == 1)
+        tdm.deleteTodo(at: 0)
+        #expect(tdm.listTodos().isEmpty)
     }
 
     @Test func deleteAll() {

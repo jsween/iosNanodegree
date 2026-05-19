@@ -51,8 +51,9 @@ public class TodosManager: Codable {
     }
 
     /// Delete a todo item by its ID
-    public func deleteTodo(at index: UUID) {
-        todos.removeAll(where: { $0.id == index })
+    public func deleteTodo(at index: Int) {
+        guard index >= 0 && index < todos.count else { return }
+        todos.remove(at: index)
     }
 
     /// Delte all todo items
