@@ -8,6 +8,6 @@
 import Foundation
 
 public protocol Cache {
-    func save(todos: [Todo]) throws
-    func load() throws -> [Todo]?
+    func save(state: AppState) throws
+    func load() throws -> AppState?
 }

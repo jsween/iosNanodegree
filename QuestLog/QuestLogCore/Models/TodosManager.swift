@@ -9,18 +9,20 @@ import Foundation
 
 /// Manages the collection of todos (quests), including adding, listing, toggling, and deleting.
 public class TodosManager {
-    private var todos: [Todo]
+    private var todos: [Todo] = []
     public private(set) var health: Int = 100
     private let cache: Cache
 
     public init(cache: Cache = FileSystemCache()) {
         self.cache = cache
-        self.todos = (try? cache.load()) ?? []
+        let state = try? cache.load()
+        self.todos = state?.todos ?? []
+        self.health = state?.health ?? 100
     }
 
     /// Persist cached todo items helper
     public func persist() {
-        try? cache.save(todos: todos)
+        try? cache.save(state: AppState(todos: todos, health: health))
     }
 
     /// Adds a new todo (quest item) with the given title
@@ -57,6 +59,7 @@ public class TodosManager {
     public func applyHealthRoll(isDone: Bool) -> DiceRoll {
         let roll = DiceRoll.roll2d6()
         health = max(0, health + (isDone ? roll.total : -roll.total)) // double if critical
+        persist()
         return roll
     }
 
@@ -76,10 +79,17 @@ public class TodosManager {
     /// Apply penalty to incorrect input
     public func applyPenalty(_ amount: Int) {
         health = max(0, health - amount)
+        persist()
     }
 
     /// Get health status
     public func getHealth() -> Int {
         health
+    }
+
+    /// Respawns a character
+    public func respawn() {
+        health = 50
+        persist()
     }
 }

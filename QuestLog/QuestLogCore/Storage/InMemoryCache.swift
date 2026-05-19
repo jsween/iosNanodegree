@@ -8,15 +8,15 @@
 import Foundation
 
 public class InMemoryCache: Cache {
-    private var stored: [Todo] = []
+    private var stored: AppState?
 
     public init() {}
 
-    public func save(todos: [Todo]) throws {
-        stored = todos
+    public func save(state: AppState) throws {
+        stored = state
     }
 
-    public func load() throws -> [Todo]? {
-        return stored.isEmpty ? nil : stored
+    public func load() throws -> AppState? {
+        return stored
     }
 }

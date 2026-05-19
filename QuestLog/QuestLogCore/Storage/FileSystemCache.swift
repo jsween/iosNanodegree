@@ -15,19 +15,19 @@ public class FileSystemCache: Cache {
         fileURL = docs.appending(path: fileName)
     }
     
-    public func save(todos: [Todo]) throws {
-        let data = try JSONEncoder().encode(todos)
+    public func save(state: AppState) throws {
+        let data = try JSONEncoder().encode(state)
         try data.write(to: fileURL)
     }
 
-    public func load() throws -> [Todo]? {
+    public func load() throws -> AppState? {
         guard FileManager.default.fileExists(atPath: fileURL.path) else {
             return nil
         }
 
         let data = try Data(contentsOf: fileURL)
 
-        return try JSONDecoder().decode([Todo].self, from: data)
+        return try JSONDecoder().decode(AppState.self, from: data)
     }
 
     public func deleteFile() throws {

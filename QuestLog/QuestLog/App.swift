@@ -115,11 +115,19 @@ class App {
     }
 
     private func showHealth() {
-        let bar = String(repeating: "❤️", count: max(0, manager.health / 10))
-        print("\(bar) HP: \(manager.health)/100")
+        let maxHealth = 100
+        let barLength = 20
+        let filled = Int((Double(manager.health) / Double(maxHealth)) * Double(barLength))
+        let empty = barLength - filled
+
+        let bar = String(repeating: "█", count: filled) + String(repeating: "░", count: empty)
+        let color = manager.health > 60 ? "🟢" : manager.health > 30 ? "🟡" : "🔴"
+        print("\(color) [\(bar)] \(manager.health)/\(maxHealth) HP")
         if manager.health == 0 {
-            print("☠️ You have fallen, adventurer. Game over. ☠️")
-            Foundation.exit(0)
+            print("☠️ You have fallen, adventurer... but the quests remain! ☠️")
+            manager.respawn()
+            print("🗡️ Respawned with 50 HP.")
+            showHealth()
         }
     }
 
