@@ -37,9 +37,14 @@ public class TodosManager: Codable {
     }
 
     /// Toggles the completions status of task by its ID
-    public func toggleCompletion(at index: UUID) {
-        guard let idx = todos.firstIndex(where: { $0.id == index }) else { return }
+    public func toggleCompletion(at index: UUID) -> Bool? {
+        guard let idx = todos.firstIndex(where: { $0.id == index }) else { return nil }
         todos[idx].isDone.toggle()
+        let isDone = todos[idx].isDone
+        let points = Int.random(in: 1...10)
+        health += isDone ? points : -points * 2
+
+        return isDone
     }
 
     /// Delete a todo item by its ID
