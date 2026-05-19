@@ -20,6 +20,11 @@ struct TodoTests {
         #expect(newTask.isDone == false)
     }
 
+    @Test func isDoneTrueWhenPassedIn() {
+        let doneTask = Todo(title: "Done Task", isDone: true)
+        #expect(doneTask.isDone)
+    }
+
     @Test mutating func isDoneCanBeToggled() {
         newTask.isDone.toggle()
         #expect(newTask.isDone)
