@@ -36,6 +36,10 @@ class App {
     }
 
     private func toggle() {
+        guard manager.listTodos().count > 0 else {
+            print("No Quests to carry out yet. Add a quest first.")
+            return
+        }
         list()
         print("Enter the quest number to update its status...")
         print("> ", terminator: "")
