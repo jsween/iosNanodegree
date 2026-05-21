@@ -35,4 +35,31 @@ struct DiceRollTests {
         #expect(roll.die1 >= 1 && roll.die1 <= 6)
         #expect(roll.die2 >= 1 && roll.die2 <= 6)
     }
+    
+    @Test func roll2d6ProducesReasonableTotal() {
+        let roll = DiceRoll.roll2d6()
+        // Minimum: 2 (1+1), Maximum: 24 (6+6 doubled)
+        #expect(roll.total >= 2)
+        #expect(roll.total <= 24)
+    }
+    
+    @Test func criticalRollsAreDetectedAutomatically() {
+        let roll = DiceRoll.roll2d6()
+        
+        // If dice match, it should be critical
+        if roll.die1 == roll.die2 {
+            #expect(roll.isCritical)
+        } else {
+            #expect(!roll.isCritical)
+        }
+    }
+    
+    @Test func allCriticalCombinationsWorkCorrectly() {
+        // Verify critical hit calculation for all possible double rolls (1-1 through 6-6)
+        // This ensures the doubling formula works correctly across the entire range
+        for i in 1...6 {
+            let roll = DiceRoll(die1: i, die2: i, isCritical: true)
+            #expect(roll.total == (i + i) * 2)
+        }
+    }
 }

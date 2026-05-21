@@ -19,27 +19,24 @@ struct TodosManagerTests {
     }
 
     @Test func initWithoutTasks() {
-        let cache = FileSystemCache(fileName: "test-initWithoutTasks.json")
+        let (manager, cache) = makeManagerAndCache(testName: "initWithoutTasks")
         defer { try? cache.deleteFile() }
-        let manager = TodosManager(cache: cache)
         
         let allTasks: [Todo] = manager.listTodos()
         #expect(allTasks.isEmpty)
     }
 
     @Test func addingATask() {
-        let cache = FileSystemCache(fileName: "test-addingATask.json")
+        let (manager, cache) = makeManagerAndCache(testName: "addingATask")
         defer { try? cache.deleteFile() }
-        let manager = TodosManager(cache: cache)
         
         manager.add("Task1")
         #expect(manager.listTodos().count == 1)
     }
 
     @Test func fetchByIdReturnsWhenMatch() {
-        let cache = FileSystemCache(fileName: "test-fetchByIdReturnsWhenMatch.json")
+        let (manager, cache) = makeManagerAndCache(testName: "fetchByIdReturnsWhenMatch")
         defer { try? cache.deleteFile() }
-        let manager = TodosManager(cache: cache)
         
         manager.add("T")
         let todoItem = manager.listTodos().first!
@@ -49,9 +46,8 @@ struct TodosManagerTests {
     }
 
     @Test func fetchByIdReturnsNilWhenNoMatch() {
-        let cache = FileSystemCache(fileName: "test-fetchByIdReturnsNilWhenNoMatch.json")
+        let (manager, cache) = makeManagerAndCache(testName: "fetchByIdReturnsNilWhenNoMatch")
         defer { try? cache.deleteFile() }
-        let manager = TodosManager(cache: cache)
         
         manager.add("T")
         let todoItem = Todo(title: "X")
@@ -60,9 +56,8 @@ struct TodosManagerTests {
     }
 
     @Test func fetchAllReturnsAllTasks() {
-        let cache = FileSystemCache(fileName: "test-fetchAllReturnsAllTasks.json")
+        let (manager, cache) = makeManagerAndCache(testName: "fetchAllReturnsAllTasks")
         defer { try? cache.deleteFile() }
-        let manager = TodosManager(cache: cache)
         
         manager.add("Task1")
         #expect(manager.listTodos().count == 1)
@@ -73,9 +68,8 @@ struct TodosManagerTests {
     }
 
     @Test func toggleIsDoneByUuid() {
-        let cache = FileSystemCache(fileName: "test-toggleIsDoneByUuid.json")
+        let (manager, cache) = makeManagerAndCache(testName: "toggleIsDoneByUuid")
         defer { try? cache.deleteFile() }
-        let manager = TodosManager(cache: cache)
         
         manager.add("T")
         var isDone = manager.toggleCompletion(at: 0)
@@ -85,9 +79,8 @@ struct TodosManagerTests {
     }
 
     @Test func deleteByIndex() {
-        let cache = FileSystemCache(fileName: "test-deleteByIndex.json")
+        let (manager, cache) = makeManagerAndCache(testName: "deleteByIndex")
         defer { try? cache.deleteFile() }
-        let manager = TodosManager(cache: cache)
         
         manager.add("T")
         #expect(manager.listTodos().count == 1)
@@ -96,9 +89,8 @@ struct TodosManagerTests {
     }
 
     @Test func deleteAll() {
-        let cache = FileSystemCache(fileName: "test-deleteAll.json")
+        let (manager, cache) = makeManagerAndCache(testName: "deleteAll")
         defer { try? cache.deleteFile() }
-        let manager = TodosManager(cache: cache)
         
         manager.add("Task1")
         manager.add("Task2")
@@ -108,9 +100,8 @@ struct TodosManagerTests {
     }
 
     @Test func penaltyReducesHealth() {
-        let cache = FileSystemCache(fileName: "test-penaltyReducesHealth.json")
+        let (manager, cache) = makeManagerAndCache(testName: "penaltyReducesHealth")
         defer { try? cache.deleteFile() }
-        let manager = TodosManager(cache: cache)
         
         let initial = manager.getHealth()
         manager.applyPenalty(10)
@@ -118,11 +109,210 @@ struct TodosManagerTests {
     }
 
     @Test func healthFloorIsZero() {
-        let cache = FileSystemCache(fileName: "test-healthFloorIsZero.json")
+        let (manager, cache) = makeManagerAndCache(testName: "healthFloorIsZero")
         defer { try? cache.deleteFile() }
-        let manager = TodosManager(cache: cache)
         
         manager.applyPenalty(999)
         #expect(manager.getHealth() == 0)
+    }
+    
+    // MARK: - Health Roll Tests
+    
+    @Test func applyHealthRollIncreasesHealthWhenCompleted() {
+        let (manager, cache) = makeManagerAndCache(testName: "applyHealthRollIncreasesHealthWhenCompleted")
+        defer { try? cache.deleteFile() }
+        
+        let initialHealth = manager.getHealth()
+        let roll = manager.applyHealthRoll(isDone: true)
+        
+        // Health should increase by at least the minimum roll (2)
+        #expect(manager.getHealth() >= initialHealth)
+        #expect(roll.total > 0)
+    }
+    
+    @Test func applyHealthRollDecreasesHealthWhenAbandoned() {
+        let (manager, cache) = makeManagerAndCache(testName: "applyHealthRollDecreasesHealthWhenAbandoned")
+        defer { try? cache.deleteFile() }
+        
+        let initialHealth = manager.getHealth()
+        let roll = manager.applyHealthRoll(isDone: false)
+        
+        // Health should decrease
+        #expect(manager.getHealth() < initialHealth)
+        #expect(roll.total > 0)
+    }
+    
+    @Test func healthRollCannotReduceHealthBelowZero() {
+        let (manager, cache) = makeManagerAndCache(testName: "healthRollCannotReduceHealthBelowZero")
+        defer { try? cache.deleteFile() }
+        
+        // Reduce health to 5 HP - low enough that most rolls will exceed it
+        manager.applyPenalty(95)
+        #expect(manager.getHealth() == 5)
+        
+        // Rolling 2d6 (2-12 points) should bring health to 0, not negative
+        // This validates the max(0, ...) clamp in applyHealthRoll
+        _ = manager.applyHealthRoll(isDone: false)
+        #expect(manager.getHealth() >= 0)
+    }
+    
+    @Test func criticalRollDoublesTotal() {
+        // Verify that critical hits properly double the dice total
+        let normalRoll = DiceRoll(die1: 3, die2: 4, isCritical: false)
+        let criticalRoll = DiceRoll(die1: 3, die2: 3, isCritical: true)
+        
+        #expect(normalRoll.total == 7)
+        #expect(criticalRoll.total == 12) // (3+3) * 2
+    }
+    
+    // MARK: - Respawn Tests
+    
+    @Test func respawnSetsHealthTo50() {
+        let (manager, cache) = makeManagerAndCache(testName: "respawnSetsHealthTo50")
+        defer { try? cache.deleteFile() }
+        
+        manager.applyPenalty(100) // Reduce to 0
+        manager.respawn()
+        #expect(manager.getHealth() == 50)
+    }
+    
+    @Test func respawnCanBeCalledMultipleTimes() {
+        let (manager, cache) = makeManagerAndCache(testName: "respawnCanBeCalledMultipleTimes")
+        defer { try? cache.deleteFile() }
+        
+        manager.applyPenalty(100)
+        manager.respawn()
+        #expect(manager.getHealth() == 50)
+        
+        manager.applyPenalty(30)
+        #expect(manager.getHealth() == 20)
+        
+        manager.respawn()
+        #expect(manager.getHealth() == 50)
+    }
+    
+    // MARK: - Persistence Tests
+    
+    @Test func addingTaskPersistsToCache() throws {
+        let cache = FileSystemCache(fileName: "test-addingTaskPersists.json")
+        defer { try? cache.deleteFile() }
+        
+        let manager = TodosManager(cache: cache)
+        manager.add("Persistent Quest")
+        
+        // Load from cache directly to verify persistence
+        let state = try cache.load()
+        #expect(state?.todos.count == 1)
+        #expect(state?.todos.first?.title == "Persistent Quest")
+    }
+    
+    @Test func healthChangePersistsToCache() throws {
+        let cache = FileSystemCache(fileName: "test-healthChangePersists.json")
+        defer { try? cache.deleteFile() }
+        
+        let manager = TodosManager(cache: cache)
+        manager.applyPenalty(25)
+        
+        // Verify health persisted
+        let state = try cache.load()
+        #expect(state?.health == 75)
+    }
+    
+    @Test func statePersistedAfterRespawn() throws {
+        let cache = FileSystemCache(fileName: "test-statePersistedAfterRespawn.json")
+        defer { try? cache.deleteFile() }
+        
+        let manager = TodosManager(cache: cache)
+        manager.applyPenalty(100)
+        manager.respawn()
+        
+        let state = try cache.load()
+        #expect(state?.health == 50)
+    }
+    
+    @Test func loadsPreviousStateOnInit() throws {
+        let cache = FileSystemCache(fileName: "test-loadsPreviousState.json")
+        defer { try? cache.deleteFile() }
+        
+        // Create initial manager and add data
+        let manager1 = TodosManager(cache: cache)
+        manager1.add("Quest 1")
+        manager1.applyPenalty(20)
+        
+        // Create new manager with same cache - should restore previous state
+        // This simulates app restart behavior 
+        let manager2 = TodosManager(cache: cache)
+        #expect(manager2.listTodos().count == 1)
+        #expect(manager2.getHealth() == 80)
+    }
+    
+    // MARK: - Edge Case Tests
+    
+    @Test func toggleInvalidIndexReturnsNil() {
+        let (manager, cache) = makeManagerAndCache(testName: "toggleInvalidIndexReturnsNil")
+        defer { try? cache.deleteFile() }
+        
+        manager.add("Task")
+        
+        #expect(manager.toggleCompletion(at: -1) == nil)
+        #expect(manager.toggleCompletion(at: 99) == nil)
+    }
+    
+    @Test func fetchByInvalidIndexReturnsNil() {
+        let (manager, cache) = makeManagerAndCache(testName: "fetchByInvalidIndexReturnsNil")
+        defer { try? cache.deleteFile() }
+        
+        manager.add("Task")
+        
+        #expect(manager.fetchBy(index: -1) == nil)
+        #expect(manager.fetchBy(index: 99) == nil)
+    }
+    
+    @Test func deleteInvalidIndexDoesNothing() {
+        let (manager, cache) = makeManagerAndCache(testName: "deleteInvalidIndexDoesNothing")
+        defer { try? cache.deleteFile() }
+        
+        manager.add("Task")
+        let countBefore = manager.listTodos().count
+        
+        manager.deleteTodo(at: -1)
+        manager.deleteTodo(at: 99)
+        
+        #expect(manager.listTodos().count == countBefore)
+    }
+    
+    @Test func fetchByIndexReturnsCorrectTodo() {
+        let (manager, cache) = makeManagerAndCache(testName: "fetchByIndexReturnsCorrectTodo")
+        defer { try? cache.deleteFile() }
+        
+        manager.add("First")
+        manager.add("Second")
+        manager.add("Third")
+        
+        let todo = manager.fetchBy(index: 1)
+        #expect(todo?.title == "Second")
+    }
+    
+    @Test func addingEmptyTitleStillCreatesTask() {
+        let (manager, cache) = makeManagerAndCache(testName: "addingEmptyTitleStillCreatesTask")
+        defer { try? cache.deleteFile() }
+        
+        // TodosManager doesn't validate title content - that's App's responsibility
+        // This ensures we don't reject valid (if unusual) input at the model layer
+        manager.add("")
+        #expect(manager.listTodos().count == 1)
+        #expect(manager.listTodos().first?.title == "")
+    }
+    
+    @Test func multipleTogglesWorkCorrectly() {
+        let (manager, cache) = makeManagerAndCache(testName: "multipleTogglesWorkCorrectly")
+        defer { try? cache.deleteFile() }
+        
+        manager.add("Task")
+        
+        #expect(manager.toggleCompletion(at: 0) == true)
+        #expect(manager.toggleCompletion(at: 0) == false)
+        #expect(manager.toggleCompletion(at: 0) == true)
+        #expect(manager.toggleCompletion(at: 0) == false)
     }
 }

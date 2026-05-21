@@ -34,4 +34,27 @@ struct TodoTests {
         let anotherTask = Todo(title: "another title")
         #expect(newTask.id != anotherTask.id)
     }
+    
+    @Test func descriptionShowsCheckmarkWhenDone() {
+        let doneTask = Todo(title: "Complete", isDone: true)
+        #expect(doneTask.description.contains("✅"))
+        #expect(doneTask.description.contains("Complete"))
+    }
+    
+    @Test func descriptionShowsEmptyBoxWhenNotDone() {
+        let todoTask = Todo(title: "Incomplete", isDone: false)
+        #expect(todoTask.description.contains("⬜"))
+        #expect(todoTask.description.contains("Incomplete"))
+    }
+    
+    @Test func equalityWorksCorrectly() {
+        let task1 = Todo(title: "Same")
+        let task2 = Todo(title: "Same")
+        
+        // Different UUIDs mean they're not equal
+        #expect(task1 != task2)
+        
+        // Same instance is equal to itself
+        #expect(task1 == task1)
+    }
 }
