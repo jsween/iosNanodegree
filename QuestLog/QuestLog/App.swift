@@ -39,7 +39,7 @@ class App {
         // Attempt to add the quest
         if manager.add(title) {
             let remaining = manager.remainingCapacity()
-            print("✅ Quest added! (\(remaining) slots remaining)")
+            print("🔥 Quest added! (\(remaining) slots remaining)")
         } else {
             // This shouldn't happen since we checked isFull() above, but defensive programming
             print("⚠️  Failed to add quest. Quest log is full.")
@@ -61,6 +61,11 @@ class App {
         for (index, todo) in todos.enumerated() {
             print(String(format: "[%02d] %@", index, todo.description))
         }
+        
+        // Show summary
+        let incompleteCount = todos.filter { !$0.isDone }.count
+        let completeCount = todos.filter { $0.isDone }.count
+        print("\n📊 \(incompleteCount) active • \(completeCount) complete • \(manager.remainingCapacity()) slots remaining")
     }
 
     /// Toggles the completion status of a quest and applies health changes.
