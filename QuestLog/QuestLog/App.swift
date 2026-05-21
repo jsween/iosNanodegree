@@ -214,6 +214,7 @@ class App {
             case .list: list(filter: argument)
             case .toggle: toggle()
             case .delete: delete()
+            case .help: explainRules()
             case .exit: exit()
             }
         }
@@ -229,7 +230,7 @@ class App {
         
         // Ensure health is within valid bounds (0-100)
         let currentHealth = max(0, min(maxHealth, manager.health))
-        
+
         // Calculate filled portion of health bar
         let filled = Int((Double(currentHealth) / Double(maxHealth)) * Double(barLength))
         let empty = max(0, barLength - filled)
@@ -287,6 +288,6 @@ class App {
 /// Available commands for interacting with the quest log application.
 extension App {
     enum Command: String {
-        case add, list, toggle, delete, exit
+        case add, list, toggle, delete, exit, help
     }
 }
