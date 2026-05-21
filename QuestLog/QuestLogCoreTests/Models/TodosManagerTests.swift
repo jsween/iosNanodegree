@@ -315,4 +315,119 @@ struct TodosManagerTests {
         #expect(manager.toggleCompletion(at: 0) == true)
         #expect(manager.toggleCompletion(at: 0) == false)
     }
+    
+    // MARK: - Quest Limit Tests
+    
+    @Test func cannotAddMoreThan100Quests() {
+        let (manager, cache) = makeManagerAndCache(testName: "cannotAddMoreThan100Quests")
+        defer { try? cache.deleteFile() }
+        
+        // Add 100 quests (should succeed)
+        for i in 1...100 {
+            let success = manager.add("Quest \(i)")
+            #expect(success, "Quest \(i) should have been added")
+        }
+        
+        #expect(manager.listTodos().count == 100)
+        #expect(manager.isFull())
+        
+        // Try to add the 101st quest (should fail)
+        let failedAdd = manager.add("Quest 101")
+        #expect(!failedAdd, "Should not be able to add 101st quest")
+        #expect(manager.listTodos().count == 100)
+    }
+    
+    @Test func isFullReturnsTrueAt100Quests() {
+        let (manager, cache) = makeManagerAndCache(testName: "isFullReturnsTrueAt100Quests")
+        defer { try? cache.deleteFile() }
+        
+        #expect(!manager.isFull())
+        
+        for i in 1...100 {
+            manager.add("Quest \(i)")
+        }
+        
+        #expect(manager.isFull())
+    }
+    
+    @Test func isFullReturnsFalseBelow100Quests() {
+        let (manager, cache) = makeManagerAndCache(testName: "isFullReturnsFalseBelow100Quests")
+        defer { try? cache.deleteFile() }
+        
+        manager.add("Quest 1")
+        #expect(!manager.isFull())
+        
+        for _ in 2...99 {
+            manager.add("Quest")
+        }
+        
+        #expect(!manager.isFull())
+    }
+    
+    @Test func remainingCapacityCalculatesCorrectly() {
+        let (manager, cache) = makeManagerAndCache(testName: "remainingCapacityCalculatesCorrectly")
+        defer { try? cache.deleteFile() }
+        
+        #expect(manager.remainingCapacity() == 100)
+        
+        manager.add("Quest 1")
+        #expect(manager.remainingCapacity() == 99)
+        
+        for _ in 2...50 {
+            manager.add("Quest")
+        }
+        #expect(manager.remainingCapacity() == 50)
+        
+        for _ in 51...100 {
+            manager.add("Quest")
+        }
+        #expect(manager.remainingCapacity() == 0) 
+    }
+    
+    @Test func canAddQuestsAfterDeletingWhenFull() {
+        let (manager, cache) = makeManagerAndCache(testName: "canAddQuestsAfterDeletingWhenFull")
+        defer { try? cache.deleteFile() }
+        
+        // Fill to capacity
+        for i in 1...100 {
+            manager.add("Quest \(i)")
+        }
+        
+        #expect(manager.isFull())
+        
+        // Try to add (should fail)
+        #expect(!manager.add("Quest 101"))
+        
+        // Delete one quest
+        manager.deleteTodo(at: 0)
+        
+        #expect(!manager.isFull())
+        #expect(manager.remainingCapacity() == 1)
+        
+        // Now adding should work
+        #expect(manager.add("Quest 101"))
+        #expect(manager.isFull())
+    }
+    
+    @Test func deleteAllResetsCapacity() {
+        let (manager, cache) = makeManagerAndCache(testName: "deleteAllResetsCapacity")
+        defer { try? cache.deleteFile() }
+        
+        // Fill to capacity
+        for i in 1...100 {
+            manager.add("Quest \(i)")
+        }
+        
+        #expect(manager.isFull())
+        #expect(manager.remainingCapacity() == 0)
+        
+        // Delete all
+        manager.deleteAll()
+        
+        #expect(!manager.isFull())
+        #expect(manager.remainingCapacity() == 100)
+        
+        // Should be able to add again
+        #expect(manager.add("New Quest"))
+    }
 }
