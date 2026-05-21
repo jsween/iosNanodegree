@@ -120,7 +120,6 @@ class App {
         // Roll dice and apply health changes
         let roll = manager.applyHealthRoll(isDone: isDone)
         printRollResult(isDone: isDone, roll: roll)
-        showHealth()
     }
 
     /// Prints the result of a dice roll after toggling quest completion.
@@ -166,7 +165,11 @@ class App {
         }
         
         manager.deleteTodo(at: index)
-        print("⚔️ Quest abandoned and forgotten.")
+        print("⚔️ Quest abandoned and forgotten.\n")
+        
+        // Clear screen and show updated active quests
+        clearScreen()
+        list()
     }
 
     /// Exits the application with a farewell message.
@@ -183,13 +186,15 @@ class App {
     public func run() {
         print("🏰 Welcome, adventurer! Your quest log awaits.")
         explainRules()
+        showHealth()
 
         while true {
-            print("\nCommands: add, list [-all|-done], toggle, delete, exit")
+            print("\nCommands: add, list [-all|-done], toggle, delete, help, exit")
             print("> ", terminator: "")
 
             // Read user input
             guard let input = readLine()?.trimmingCharacters(in: .whitespaces) else {
+                clearScreen()
                 print("Unknown command. Minus 5 hp")
                 manager.applyPenalty(5)
                 showHealth()
@@ -200,6 +205,7 @@ class App {
             let parts = input.split(separator: " ", maxSplits: 1).map { String($0).lowercased() }
             guard let commandString = parts.first,
                   let command = Command(rawValue: commandString) else {
+                clearScreen()
                 print("Unknown command. Minus 5 hp")
                 manager.applyPenalty(5)
                 showHealth()
@@ -207,6 +213,9 @@ class App {
             }
             
             let argument = parts.count > 1 ? parts[1] : nil
+            
+            // Clear screen before executing command
+            clearScreen()
 
             // Execute the corresponding command handler
             switch command {
@@ -217,6 +226,9 @@ class App {
             case .help: explainRules()
             case .exit: exit()
             }
+            
+            // Show updated health after command execution
+            showHealth()
         }
     }
 
@@ -274,12 +286,17 @@ class App {
           list -done      - Show completed quests only
           toggle          - Mark a quest complete/incomplete
           delete          - Remove a quest
+          help            - Show these rules again
           exit            - Quit the adventure
         
         Type commands carefully, adventurer...
         --------------------------------
         """)
-        showHealth()
+    }
+
+    /// Clears the terminal screen for a cleaner interface
+    private func clearScreen() {
+        print(String(repeating: "\n", count: 100))
     }
 }
 
@@ -288,6 +305,6 @@ class App {
 /// Available commands for interacting with the quest log application.
 extension App {
     enum Command: String {
-        case add, list, toggle, delete, exit, help
+        case add, list, toggle, delete, help, exit
     }
 }
