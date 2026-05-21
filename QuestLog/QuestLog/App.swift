@@ -55,8 +55,10 @@ class App {
     /// - Rolling doubles triggers critical effects (doubled damage/healing)
     /// Invalid input results in a 3 HP penalty.
     private func toggle() {
+        let todos = manager.listTodos()
+
         // Ensure there are quests available
-        guard manager.listTodos().count > 0 else {
+        guard !todos.isEmpty else {
             print("No Quests to carry out yet. Add a quest first.")
             return
         }
@@ -218,7 +220,7 @@ class App {
     }
 }
 
-// MARK: - Command Enum
+// MARK: - Command
 
 /// Available commands for interacting with the quest log application.
 extension App {
