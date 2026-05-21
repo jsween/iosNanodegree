@@ -11,7 +11,12 @@ import Foundation
 /// This is the main business logic layer that coordinates between in-memory state
 /// and persistent storage via a Cache. Handles quest CRUD operations, health tracking,
 /// dice rolling mechanics, and automatic persistence after state changes.
+///
+/// **Quest Limit:** Maximum of 100 active quests to ensure performance and usability.
 public class TodosManager {
+    /// Maximum number of quests allowed in the quest log
+    public static let maxQuests = 100
+    
     /// The in-memory collection of all quests
     private var todos: [Todo] = []
     
@@ -47,9 +52,17 @@ public class TodosManager {
     /// Automatically persists after adding.
     ///
     /// - Parameter title: The name of the new quest
-    public func add(_ title: String) {
+    /// - Returns: `true` if the quest was added, `false` if the quest log is full (100 quests)
+    @discardableResult
+    public func add(_ title: String) -> Bool {
+        // Enforce maximum quest limit
+        guard todos.count < Self.maxQuests else {
+            return false
+        }
+        
         todos.append(Todo(title: title))
         persist()
+        return true
     }
 
     /// Fetches a quest by its unique identifier.
@@ -74,6 +87,20 @@ public class TodosManager {
     /// - Returns: An array of all Todo items
     public func listTodos() -> [Todo] {
         return todos
+    }
+    
+    /// Checks if the quest log is at maximum capacity.
+    ///
+    /// - Returns: `true` if the quest log has 100 quests, `false` otherwise
+    public func isFull() -> Bool {
+        return todos.count >= Self.maxQuests
+    }
+    
+    /// Returns the number of remaining quest slots.
+    ///
+    /// - Returns: The number of quests that can still be added (0-100)
+    public func remainingCapacity() -> Int {
+        return max(0, Self.maxQuests - todos.count)
     }
 
     /// Toggles the completion status of the quest at the specified index.

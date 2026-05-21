@@ -18,7 +18,15 @@ class App {
     
     /// Prompts the user to add a new quest (todo item) to their quest log.
     /// Validates that the title is not empty before adding.
+    /// Enforces the maximum quest limit (100 quests).
     private func add() {
+        // Check if quest log is full
+        if manager.isFull() {
+            print("⚠️  Quest log is full! You have reached the maximum of \(TodosManager.maxQuests) quests.")
+            print("Complete or delete some quests before adding new ones.")
+            return
+        }
+        
         print("📜 What is the name of your quest?")
         print("> ", terminator: "")
         
@@ -28,8 +36,14 @@ class App {
             return
         }
 
-        manager.add(title)
-        print("Quest added")
+        // Attempt to add the quest
+        if manager.add(title) {
+            let remaining = manager.remainingCapacity()
+            print("✅ Quest added! (\(remaining) slots remaining)")
+        } else {
+            // This shouldn't happen since we checked isFull() above, but defensive programming
+            print("⚠️  Failed to add quest. Quest log is full.")
+        }
     }
 
     /// Displays all quests in the quest log with their index numbers.
@@ -55,10 +69,8 @@ class App {
     /// - Rolling doubles triggers critical effects (doubled damage/healing)
     /// Invalid input results in a 3 HP penalty.
     private func toggle() {
-        let todos = manager.listTodos()
-
         // Ensure there are quests available
-        guard !todos.isEmpty else {
+        guard !manager.listTodos().isEmpty else {
             print("No Quests to carry out yet. Add a quest first.")
             return
         }
