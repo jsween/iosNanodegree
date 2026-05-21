@@ -56,6 +56,7 @@
 		B70650ED2FBAA08300ED4409 /* QuestLog */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = QuestLog; sourceTree = BUILT_PRODUCTS_DIR; };
 		B70650FF2FBBC4F800ED4409 /* QuestLogCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = QuestLogCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B70651092FBBC4F800ED4409 /* QuestLogCoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QuestLogCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B71C9B1C2FBEAFEA00D8BC02 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -106,6 +107,7 @@
 		B70650E42FBAA08300ED4409 = {
 			isa = PBXGroup;
 			children = (
+				B71C9B1C2FBEAFEA00D8BC02 /* README.md */,
 				B70650EF2FBAA08300ED4409 /* QuestLog */,
 				B70651002FBBC4F800ED4409 /* QuestLogCore */,
 				B706510D2FBBC4F800ED4409 /* QuestLogCoreTests */,
