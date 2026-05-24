@@ -38,20 +38,21 @@ struct EventRow: View {
             Image(systemName: event.iconName)
                 .foregroundStyle(event.textColor)
                 .font(.title)
-                .frame(width: 60, height: 60)
+                .frame(width: 48, height: 48)
                 .background(
                     RoundedRectangle(cornerRadius: 10)
-                        .fill(event.textColor.opacity(0.1))
+                        .fill(.secondary.opacity(0.1))
                 )
 
-            VStack {
+            VStack(alignment: .leading) {
                 Text(event.title)
-                    .font(.title)
+                    .font(.title2)
                     .foregroundStyle(event.textColor)
 
                 Text(relativeDate)
                     .font(.subheadline)
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.secondary)
+                    .padding(.leading, 16)
             }
             Spacer()
         }

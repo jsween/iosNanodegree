@@ -20,12 +20,24 @@ struct EventsScreen: View {
     var body: some View {
         NavigationStack {
             List {
-                ForEach(events) { event in
-                    NavigationLink(value: EventFormMode.edit(event)) {
-                        EventRow(event: event)
+                if events.isEmpty {
+                    VStack(spacing: 12) {
+                        Text("No Events Yet...")
+                            .font(.title)
+                        Text("Tap the plus button to add an event")
+                            .foregroundStyle(.secondary)
                     }
+                    .frame(maxWidth: .infinity)
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+                } else {
+                    ForEach(events) { event in
+                        NavigationLink(value: EventFormMode.edit(event)) {
+                            EventRow(event: event)
+                        }
+                    }
+                    .onDelete(perform: deleteEvent)
                 }
-                .onDelete(perform: deleteEvent)
             }
             .navigationTitle(Text("Until Then"))
             .navigationDestination(for: EventFormMode.self) { mode in
