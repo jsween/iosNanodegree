@@ -14,7 +14,7 @@ import SwiftUI
 struct Event: Identifiable, Comparable, Hashable {
 
     /// A unique identifier for the event, used by SwiftUI to track list rows.
-    let id: UUID = UUID()
+    let id: UUID
 
     /// The name of the event, displayed in each row and editable via `EventForm`.
     var title: String
@@ -24,6 +24,13 @@ struct Event: Identifiable, Comparable, Hashable {
 
     /// The color used to render the event title in `EventRow`.
     var textColor: Color
+
+    init(id: UUID = UUID(), title: String, date: Date, textColor: Color) {
+        self.id = id
+        self.title = title
+        self.date = date
+        self.textColor = textColor
+    }
 
     /// Returns `true` if the left event occurs sooner than the right event.
     ///
