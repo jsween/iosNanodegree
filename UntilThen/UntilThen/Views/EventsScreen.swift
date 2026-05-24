@@ -1,5 +1,5 @@
 //
-//  EventsView.swift
+//  EventsScreen.swift
 //  UntilThen
 //
 //  Created by Jonathan Sweeney on 5/23/26.
@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// Displays a sorted, swipeable list of events and handles navigation to EventForm
-struct EventsView: View {
+struct EventsScreen: View {
 
     // MARK: State
 
@@ -29,8 +29,7 @@ struct EventsView: View {
             }
             .navigationTitle(Text("Until Then"))
             .navigationDestination(for: EventFormMode.self) { mode in
-                //                TODO: Create EventForm(mode: mode, onSave: handleSave)
-                Text("Not Implemented yet...")
+                EventForm(mode: mode, onSave: handleSave)
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -63,5 +62,5 @@ struct EventsView: View {
 }
 
 #Preview {
-    EventsView(events: Event.sampleEvents)
+    EventsScreen(events: Event.sampleEvents)
 }

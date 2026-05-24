@@ -26,6 +26,7 @@ struct EventForm: View {
     @State private var title: String
     @State private var date: Date
     @State private var textColor: Color
+    @State private var iconName: String
 
     /// The event being edited, if in edit mode
     private var existingEvent: Event? {
@@ -44,10 +45,12 @@ struct EventForm: View {
             _title = State(initialValue: event.title)
             _date = State(initialValue: event.date)
             _textColor = State(initialValue: event.textColor)
+            _iconName = State(initialValue: event.iconName)
         } else {
             _title = State(initialValue: "")
             _date = State(initialValue: .now)
             _textColor = State(initialValue: .primary)
+            _iconName = State(initialValue: "calendar")
         }
     }
 
@@ -61,6 +64,16 @@ struct EventForm: View {
                            displayedComponents: [.date, .hourAndMinute]
                 )
                 ColorPicker("TitleColor", selection: $textColor)
+                NavigationLink {
+                    SymbolPicker(selectedSymbol: $iconName, tintColor: textColor)
+                } label: {
+                    HStack {
+                        Text("Icon")
+                        Spacer()
+                        Image(systemName: iconName)
+                            .foregroundStyle(textColor)
+                    }
+                }
             }
         }
         .navigationTitle(navigationTitle)
@@ -93,7 +106,9 @@ struct EventForm: View {
 
     // Builds the event and passes to parent, then dismisses
     private func handleSave() {
-        let event = Event(id: existingEvent?.id ?? UUID(), title: title.trimmingCharacters(in: .whitespacesAndNewlines), date: date, textColor: textColor)
+        let event = Event(id: existingEvent?.id ?? UUID(), title: title.trimmingCharacters(in: .whitespacesAndNewlines), date: date, textColor: textColor,
+            iconName: iconName
+        )
         onSave(event)
         dismiss()
     }

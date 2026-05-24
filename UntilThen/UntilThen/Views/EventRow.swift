@@ -34,14 +34,26 @@ struct EventRow: View {
     // MARK: - Body
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(event.title)
-                .font(.headline)
+        HStack {
+            Image(systemName: event.iconName)
                 .foregroundStyle(event.textColor)
+                .font(.title)
+                .frame(width: 60, height: 60)
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(event.textColor.opacity(0.1))
+                )
 
-            Text(relativeDate)
-                .font(.subheadline)
-                .foregroundStyle(.black)
+            VStack {
+                Text(event.title)
+                    .font(.title)
+                    .foregroundStyle(event.textColor)
+
+                Text(relativeDate)
+                    .font(.subheadline)
+                    .foregroundStyle(.black)
+            }
+            Spacer()
         }
         .onAppear(perform: updateRelativeDate)
         .onReceive(timer) { _ in
@@ -57,6 +69,7 @@ struct EventRow: View {
     }
 }
 
-#Preview {
+#Preview(traits: .sizeThatFitsLayout) {
     EventRow(event: Event.event1)
+        .padding()
 }

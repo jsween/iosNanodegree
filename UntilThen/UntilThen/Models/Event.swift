@@ -25,11 +25,15 @@ struct Event: Identifiable, Comparable, Hashable {
     /// The color used to render the event title in `EventRow`.
     var textColor: Color
 
-    init(id: UUID = UUID(), title: String, date: Date, textColor: Color) {
+    /// The icon for the event
+    var iconName: String
+
+    init(id: UUID = UUID(), title: String, date: Date, textColor: Color, iconName: String = "calendar") {
         self.id = id
         self.title = title
         self.date = date
         self.textColor = textColor
+        self.iconName = iconName
     }
 
     /// Returns `true` if the left event occurs sooner than the right event.
@@ -43,9 +47,9 @@ struct Event: Identifiable, Comparable, Hashable {
 
 #if DEBUG
 extension Event {
-    static let event1 = Event(title: "Event 1", date: .now.addingTimeInterval(500), textColor: .red)
-    static let event2 = Event(title: "Event 2", date: .now.addingTimeInterval(1_000), textColor: .blue)
-    static let event3 = Event(title: "Event 3", date: .now.addingTimeInterval(2_000_000), textColor: .yellow)
+    static let event1 = Event(title: "Event 1", date: .now.addingTimeInterval(500), textColor: .red, iconName: "star")
+    static let event2 = Event(title: "Event 2", date: .now.addingTimeInterval(1_000), textColor: .blue, iconName: "star.fill")
+    static let event3 = Event(title: "Event 3", date: .now.addingTimeInterval(2_000_000), textColor: .yellow, iconName: "heart.fill")
     static let event4 = Event(title: "Event 4", date: .now.addingTimeInterval(100_000_000), textColor: .green)
 
     static let sampleEvents: [Event] = [event1, event2, event3, event4]
