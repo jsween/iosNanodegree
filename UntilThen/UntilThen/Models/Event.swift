@@ -33,3 +33,13 @@ struct Event: Identifiable, Comparable {
         lhs.date < rhs.date
     }
 }
+
+#if DEBUG
+extension Event {
+    static let event1 = Event(title: "Event 1", date: .now.addingTimeInterval(500), textColor: .red)
+    static let event2 = Event(title: "Event 2", date: .now.addingTimeInterval(1_000), textColor: .blue)
+    static let event3 = Event(title: "Event 3", date: .now.addingTimeInterval(2_000), textColor: .yellow)
+
+    static let sampleEvents: [Event] = [event1, event2, event3]
+}
+#endif
