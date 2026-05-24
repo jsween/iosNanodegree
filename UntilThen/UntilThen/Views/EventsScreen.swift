@@ -21,15 +21,11 @@ struct EventsScreen: View {
         NavigationStack {
             List {
                 if events.isEmpty {
-                    VStack(spacing: 12) {
-                        Text("No Events Yet...")
-                            .font(.title)
-                        Text("Tap the plus button to add an event")
-                            .foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .listRowBackground(Color.clear)
-                    .listRowSeparator(.hidden)
+                    ContentUnavailableView(
+                        "No Events Yet...",
+                        systemImage: "calendar.badge.plus",
+                        description: Text("Tap the + icon to add your first event!")
+                    )
                 } else {
                     ForEach(events) { event in
                         NavigationLink(value: EventFormMode.edit(event)) {
@@ -47,6 +43,8 @@ struct EventsScreen: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink(value: EventFormMode.add) {
                         Image(systemName: "plus")
+                            .symbolEffect(.bounce, options: .speed(0.3).nonRepeating, isActive: events.isEmpty)
+                            .symbolEffect(.pulse, options: .speed(0.5).repeating, isActive: events.isEmpty)
                     }
                 }
             }
@@ -71,6 +69,10 @@ struct EventsScreen: View {
             events.append(event)   // add mode — append, list re-sorts on render
         }
     }
+}
+
+#Preview {
+    EventsScreen(events: [])
 }
 
 #Preview {
