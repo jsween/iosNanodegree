@@ -11,7 +11,7 @@ import SwiftUI
 ///
 /// Events conform to `Identifiable` so SwiftUI's `List` can track each row,
 /// and to `Comparable` so an array of events can be sorted by date using `.sorted()`.
-struct Event: Identifiable, Comparable {
+struct Event: Identifiable, Comparable, Hashable {
 
     /// A unique identifier for the event, used by SwiftUI to track list rows.
     let id: UUID = UUID()
