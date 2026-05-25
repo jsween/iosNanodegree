@@ -15,9 +15,18 @@ struct EventRow: View {
 
     /// Formatted relative date string (e.g. in 3 weeks, 2 days ago)
     @State private var relativeDate: String = ""
+    
+    /// Tracks whether animation should be active
+    @State private var isAnimating: Bool = false
 
     /// The event shown in view
     let event: Event
+
+    /// Is the event about to start (within 10 seconds and still in the future)
+    private var isImminent: Bool {
+        let timeUntilEvent = event.date.timeIntervalSinceNow
+        return timeUntilEvent > 0 && timeUntilEvent <= 11
+    }
 
     /// Fires every second to keep the relative date string up to date
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -43,6 +52,13 @@ struct EventRow: View {
                     RoundedRectangle(cornerRadius: 10)
                         .fill(.secondary.opacity(0.1))
                 )
+                .scaleEffect(isImminent && isAnimating ? 1.3 : 1.0)
+                .animation(
+                    isAnimating 
+                    ? .easeInOut(duration: 0.8).repeatForever(autoreverses: true)
+                    : .easeInOut(duration: 0.3),
+                    value: isAnimating
+                )
 
             VStack(alignment: .leading) {
                 Text(event.title)
@@ -56,9 +72,15 @@ struct EventRow: View {
             }
             Spacer()
         }
-        .onAppear(perform: updateRelativeDate)
+        .onAppear {
+            updateRelativeDate()
+            // Initialize animation state on appear
+            isAnimating = isImminent
+        }
         .onReceive(timer) { _ in
             updateRelativeDate()
+            // Update animation based on current imminence
+            isAnimating = isImminent
         }
     }
 
@@ -72,5 +94,10 @@ struct EventRow: View {
 
 #Preview(traits: .sizeThatFitsLayout) {
     EventRow(event: Event.event1)
+        .padding()
+}
+
+#Preview(traits: .sizeThatFitsLayout) {
+    EventRow(event: Event.event0)
         .padding()
 }

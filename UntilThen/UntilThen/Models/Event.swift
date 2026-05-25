@@ -47,11 +47,12 @@ struct Event: Identifiable, Comparable, Hashable {
 
 #if DEBUG
 extension Event {
+    static let event0 = Event(title: "Event 0", date: .now.addingTimeInterval(15), textColor: .orange, iconName: "leaf.fill")
     static let event1 = Event(title: "Event 1", date: .now.addingTimeInterval(500), textColor: .red, iconName: "star")
     static let event2 = Event(title: "Event 2", date: .now.addingTimeInterval(1_000), textColor: .blue, iconName: "star.fill")
     static let event3 = Event(title: "Event 3", date: .now.addingTimeInterval(2_000_000), textColor: .yellow, iconName: "heart.fill")
     static let event4 = Event(title: "Event 4", date: .now.addingTimeInterval(100_000_000), textColor: .green)
 
-    static let sampleEvents: [Event] = [event1, event2, event3, event4]
+    static let sampleEvents: [Event] = [event0, event1, event2, event3, event4]
 }
 #endif
