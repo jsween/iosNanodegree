@@ -27,7 +27,7 @@ struct EventsScreen: View {
                         description: Text("Tap the + icon to add your first event!")
                     )
                 } else {
-                    ForEach(events) { event in
+                    ForEach(events.sorted()) { event in
                         NavigationLink(value: EventFormMode.edit(event)) {
                             EventRow(event: event)
                         }
