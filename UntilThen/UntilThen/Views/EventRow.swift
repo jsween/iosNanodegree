@@ -11,13 +11,17 @@ internal import Combine
 /// A list row that displays an event's title and a live countdown to (or since) its datetime
 struct EventRow: View {
 
-    // MARK: - Properties
+    // MARK: - State
 
     /// Formatted relative date string (e.g. in 3 weeks, 2 days ago)
     @State private var relativeDate: String = ""
     
     /// Tracks whether animation should be active
     @State private var isAnimating: Bool = false
+
+    @State private var shouldDim: Bool = false
+
+    // MARK: - Properties
 
     /// The event shown in view
     let event: Event
@@ -26,6 +30,10 @@ struct EventRow: View {
     private var isImminent: Bool {
         let timeUntilEvent = event.date.timeIntervalSinceNow
         return timeUntilEvent > 0 && timeUntilEvent <= 11
+    }
+
+    private var isInPast: Bool {
+        event.date.timeIntervalSinceNow < 0
     }
 
     /// Fires every second to keep the relative date string up to date
@@ -47,6 +55,7 @@ struct EventRow: View {
             Image(systemName: event.iconName)
                 .foregroundStyle(event.textColor)
                 .font(.title)
+                .opacity(isInPast ? 0.4 : 1)
                 .frame(width: 48, height: 48)
                 .background(
                     RoundedRectangle(cornerRadius: 10)
@@ -64,6 +73,7 @@ struct EventRow: View {
                 Text(event.title)
                     .font(.title2)
                     .foregroundStyle(event.textColor)
+                    .opacity(isInPast ? 0.4 : 1)
 
                 Text(relativeDate)
                     .font(.subheadline)
@@ -76,11 +86,13 @@ struct EventRow: View {
             updateRelativeDate()
             // Initialize animation state on appear
             isAnimating = isImminent
+            shouldDim = isInPast
         }
         .onReceive(timer) { _ in
             updateRelativeDate()
             // Update animation based on current imminence
             isAnimating = isImminent
+            shouldDim = isInPast
         }
     }
 
