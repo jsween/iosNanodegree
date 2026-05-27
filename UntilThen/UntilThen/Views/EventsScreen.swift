@@ -77,7 +77,7 @@ struct EventsScreen: View {
                     NavigationLink(value: EventFormMode.add) {
                         Image(systemName: "plus")
                             .symbolEffect(.bounce, options: .speed(0.3).nonRepeating, isActive: events.isEmpty)
-                            .symbolEffect(.pulse, options: .speed(0.5).repeating, isActive: events.isEmpty)
+                            .symbolEffect(.pulse, options: .speed(0.9).repeating, isActive: events.isEmpty)
                     }
                 }
                 ToolbarItem(placement: .topBarLeading) {

@@ -61,6 +61,7 @@ struct EventForm: View {
 
                 DatePicker("Date",
                            selection: $date,
+                           in: Date.now...,
                            displayedComponents: [.date, .hourAndMinute]
                 )
                 .datePickerStyle(.compact)
