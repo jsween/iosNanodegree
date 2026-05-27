@@ -20,6 +20,9 @@ struct EventForm: View {
 
     let onSave: (Event) -> Void
 
+    // Haptic generator
+    let generator = UINotificationFeedbackGenerator()
+
     // MARK: - State
 
     /// Local editable copies of the event's fields, changes based on mode
@@ -109,7 +112,6 @@ struct EventForm: View {
 
     // Builds the event and passes to parent, then dismisses
     private func handleSave() {
-
         let event = Event(
             id: existingEvent?.id ?? UUID(),
             title: title.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -118,6 +120,9 @@ struct EventForm: View {
             iconName: iconName
         )
         onSave(event)
+        generator.prepare()
+        generator.notificationOccurred(.success)
+        
         dismiss()
     }
 }
