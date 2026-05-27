@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-internal import Combine
+import TipKit
 
 /// Displays a sorted, swipeable list of events and handles navigation to EventForm
 struct EventsScreen: View {
@@ -18,19 +18,21 @@ struct EventsScreen: View {
 
     /// Bool to show or hide past events
     @State private var showPastEvents: Bool = true
-    
-    /// Current time - updates every second to refresh filtered events
-    @State private var currentTime: Date = .now
+
+    /// Tip to teach users about the past events toggle
+    private let pastEventsTip = PastEventsTip()
 
     // MARK: - Properties
-    
-    /// Timer that fires every second to update current time
-    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-    /// All or future events
+    /// If past events exist
+    private var hasPastEvents: Bool {
+        events.contains { $0.date < .now }
+    }
+
+    /// A filter for all events or future only
     private var filteredEvents: [Event] {
         let sorted = events.sorted()
-        return showPastEvents ? sorted : sorted.filter { $0.date > currentTime }
+        return showPastEvents ? sorted : sorted.filter { $0.date > .now }
     }
 
     // MARK: - Body
@@ -44,7 +46,14 @@ struct EventsScreen: View {
                         systemImage: "calendar.badge.plus",
                         description: Text("Tap the + icon to add your first event!")
                     )
-                } else {
+                }  else if filteredEvents.isEmpty {
+                    ContentUnavailableView(
+                        "No Upcoming Events",
+                        systemImage: "clock",
+                        description: Text("All your events have passed")
+                    )
+                }
+                else {
                     ForEach(filteredEvents) { event in
                         NavigationLink(value: EventFormMode.edit(event)) {
                             EventRow(event: event)
@@ -53,8 +62,11 @@ struct EventsScreen: View {
                     .onDelete(perform: deleteEvent)
                 }
             }
-            .onReceive(timer) { time in
-                currentTime = time
+            .onAppear {
+                PastEventsTip.hasPastEvents = hasPastEvents
+            }
+            .onChange(of: hasPastEvents) { _, newValue in
+                PastEventsTip.hasPastEvents = newValue
             }
             .navigationTitle(Text("Events"))
             .navigationDestination(for: EventFormMode.self) { mode in
@@ -76,6 +88,7 @@ struct EventsScreen: View {
                     } label: {
                         Image(systemName: showPastEvents ? "clock.fill" : "clock")
                     }
+                    .popoverTip(pastEventsTip)
                 }
             }
         }
