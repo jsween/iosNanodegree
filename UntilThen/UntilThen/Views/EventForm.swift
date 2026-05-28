@@ -112,14 +112,24 @@ struct EventForm: View {
 
     // Builds the event and passes to parent, then dismisses
     private func handleSave() {
-        let event = Event(
-            id: existingEvent?.id ?? UUID(),
-            title: title.trimmingCharacters(in: .whitespacesAndNewlines),
-            date: date,
-            textColor: textColor,
-            iconName: iconName
-        )
-        onSave(event)
+        if let existingEvent = existingEvent {
+            // Edit mode - update existing event
+            existingEvent.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
+            existingEvent.date = date
+            existingEvent.textColor = textColor
+            existingEvent.iconName = iconName
+            onSave(existingEvent)
+        } else {
+            // Add mode - create new event
+            let event = Event(
+                title: title.trimmingCharacters(in: .whitespacesAndNewlines),
+                date: date,
+                textColor: textColor,
+                iconName: iconName
+            )
+            onSave(event)
+        }
+        
         generator.prepare()
         generator.notificationOccurred(.success)
         

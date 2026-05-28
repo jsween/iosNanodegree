@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 import TipKit
 
 @main
@@ -25,5 +26,6 @@ struct UntilThenApp: App {
                     ])
                 }
         }
+        .modelContainer(for: Event.self)
     }
 }
