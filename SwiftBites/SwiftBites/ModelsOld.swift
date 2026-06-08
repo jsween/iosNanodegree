@@ -12,6 +12,7 @@ import Foundation
  * It is essential to remove this file before the final project submission.
  */
 
+// TODO: Replace Category next
 struct MockCategory: Identifiable, Hashable, Codable {
   let id: UUID
   var name: String
