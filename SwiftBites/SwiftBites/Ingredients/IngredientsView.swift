@@ -14,82 +14,67 @@ struct IngredientsView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var query = ""
 
-    @Query private var ingredients: [Ingredient]
-
-    // MARK: - Body
-
     var body: some View {
         NavigationStack {
-            content
+            IngredientListView(query: query, selection: selection)
                 .navigationTitle("Ingredients")
                 .toolbar {
-                    if !ingredients.isEmpty {
-                        NavigationLink(value: IngredientForm.Mode.add) {
-                            Label("Add", systemImage: "plus")
-                        }
+                    NavigationLink(value: IngredientForm.Mode.add) {
+                        Label("Add", systemImage: "plus")
                     }
                 }
                 .navigationDestination(for: IngredientForm.Mode.self) { mode in
                     IngredientForm(mode: mode)
                 }
+                .searchable(text: $query)
         }
     }
+}
 
-    // MARK: - Views
+private struct IngredientListView: View {
+    typealias Selection = (Ingredient) -> Void
 
-    @ViewBuilder
-    private var content: some View {
-        if ingredients.isEmpty && query.isEmpty {
-            empty
+    @Environment(\.modelContext) private var context
+    @Environment(\.dismiss) private var dismiss
+    @Query private var ingredients: [Ingredient]
+
+    let selection: Selection?
+
+    init(query: String, selection: Selection? = nil) {
+        self.selection = selection
+        let predicate = #Predicate<Ingredient> { ingredient in
+            query.isEmpty ? true : ingredient.name.contains(query)
+        }
+        _ingredients = Query(filter: predicate, animation: .default)
+    }
+
+    var body: some View {
+        if ingredients.isEmpty {
+            ContentUnavailableView(
+                label: {
+                    Label("No Ingredients", systemImage: "list.clipboard")
+                },
+                description: {
+                    Text("Ingredients you add will appear here.")
+                },
+                actions: {
+                    NavigationLink("Add Ingredient", value: IngredientForm.Mode.add)
+                        .buttonBorderShape(.roundedRectangle)
+                        .buttonStyle(.borderedProminent)
+                }
+            )
         } else {
-            list
-        }
-    }
-
-    private var empty: some View {
-        ContentUnavailableView(
-            label: {
-                Label("No Ingredients", systemImage: "list.clipboard")
-            },
-            description: {
-                Text("Ingredients you add will appear here.")
-            },
-            actions: {
-                NavigationLink("Add Ingredient", value: IngredientForm.Mode.add)
-                    .buttonBorderShape(.roundedRectangle)
-                    .buttonStyle(.borderedProminent)
-            }
-        )
-    }
-
-    private var noResults: some View {
-        ContentUnavailableView(
-            label: {
-                Text("Couldn't find \"\(query)\"")
-            }
-        )
-        .listRowSeparator(.hidden)
-    }
-
-    private var list: some View {
-        List {
-            if ingredients.isEmpty {
-                noResults
-            } else {
+            List {
                 ForEach(ingredients) { ingredient in
                     row(for: ingredient)
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button("Delete", systemImage: "trash", role: .destructive) {
-                                delete(ingredient: ingredient)
+                                context.delete(ingredient)
                             }
                         }
                 }
             }
-        }
-        .searchable(text: $query)
-        .listStyle(.plain)
-        .onChange(of: query) {
-            filterIngredients()
+            .listStyle(.plain)
         }
     }
 
@@ -101,9 +86,7 @@ struct IngredientsView: View {
                     selection(ingredient)
                     dismiss()
                 },
-                label: {
-                    title(for: ingredient)
-                }
+                label: { title(for: ingredient) }
             )
         } else {
             NavigationLink(value: IngredientForm.Mode.edit(ingredient)) {
@@ -115,24 +98,5 @@ struct IngredientsView: View {
     private func title(for ingredient: Ingredient) -> some View {
         Text(ingredient.name)
             .font(.title3)
-    }
-
-    // MARK: - Data
-
-    private func delete(ingredient: Ingredient) {
-        context.delete(ingredient)
-    }
-
-    private func filterIngredients() {
-        do {
-            let predicate = #Predicate<Ingredient> { ingredient in
-                query.isEmpty ? true : ingredient.name.localizedStandardContains(query)
-            }
-            let descriptor = FetchDescriptor(predicate: predicate)
-            let filtered = try context.fetch(descriptor)
-            _ = filtered
-        } catch {
-            print("Filter error: \(error)")
-        }
     }
 }
