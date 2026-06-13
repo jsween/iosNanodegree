@@ -36,19 +36,19 @@ struct RecipesView: View {
             Menu("Sort", systemImage: "arrow.up.arrow.down") {
                 Picker("Sort", selection: $sortOrder) {
                     Text("Name")
-                        .tag(SortDescriptor(\MockRecipe.name))
+                        .tag(SortDescriptor(\Recipe.name))
 
                     Text("Serving (low to high)")
-                        .tag(SortDescriptor(\MockRecipe.serving, order: .forward))
+                        .tag(SortDescriptor(\Recipe.serving, order: .forward))
 
                     Text("Serving (high to low)")
-                        .tag(SortDescriptor(\MockRecipe.serving, order: .reverse))
+                        .tag(SortDescriptor(\Recipe.serving, order: .reverse))
 
                     Text("Time (short to long)")
-                        .tag(SortDescriptor(\MockRecipe.time, order: .forward))
+                        .tag(SortDescriptor(\Recipe.time, order: .forward))
 
                     Text("Time (long to short)")
-                        .tag(SortDescriptor(\MockRecipe.time, order: .reverse))
+                        .tag(SortDescriptor(\Recipe.time, order: .reverse))
                 }
             }
             .pickerStyle(.inline)
