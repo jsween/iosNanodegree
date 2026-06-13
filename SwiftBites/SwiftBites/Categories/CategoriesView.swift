@@ -2,19 +2,14 @@ import SwiftUI
 import SwiftData
 
 struct CategoriesView: View {
-    @Environment(\.modelContext) private var context
     @State private var query = ""
-
-    @Query private var categories: [Category] = []
-
-    // MARK: - Body
 
     var body: some View {
         NavigationStack {
-            content
+            CategoryListView(query: query)
                 .navigationTitle("Categories")
                 .toolbar {
-                    if !categories.isEmpty {
+                    ToolbarItem(placement: .topBarTrailing) {
                         NavigationLink(value: CategoryForm.Mode.add) {
                             Label("Add", systemImage: "plus")
                         }
@@ -26,54 +21,44 @@ struct CategoriesView: View {
                 .navigationDestination(for: RecipeForm.Mode.self) { mode in
                     RecipeForm(mode: mode)
                 }
+                .searchable(text: $query)
         }
     }
+}
 
-    // MARK: - Views
+private struct CategoryListView: View {
+    @Query private var categories: [Category]
 
-    @ViewBuilder
-    private var content: some View {
-        if categories.isEmpty && query.isEmpty {
-            empty
+    // TODO: convert both to lower to compare ITALIAN, ItaLian, or italian to Italian
+    init(query: String) {
+        let predicate = #Predicate<Category> { category in
+            query.isEmpty ? true : category.name.contains(query)
+        }
+        _categories = Query(filter: predicate, animation: .default)
+    }
+
+    var body: some View {
+        if categories.isEmpty {
+            ContentUnavailableView(
+                label: {
+                    Label("No Categories", systemImage: "list.clipboard")
+                },
+                description: {
+                    Text("Categories you add will appear here.")
+                },
+                actions: {
+                    NavigationLink("Add Category", value: CategoryForm.Mode.add)
+                        .buttonBorderShape(.roundedRectangle)
+                        .buttonStyle(.borderedProminent)
+                }
+            )
         } else {
-            list
-        }
-    }
-
-    private var empty: some View {
-        ContentUnavailableView(
-            label: {
-                Label("No Categories", systemImage: "list.clipboard")
-            },
-            description: {
-                Text("Categories you add will appear here.")
-            },
-            actions: {
-                NavigationLink("Add Category", value: CategoryForm.Mode.add)
-                    .buttonBorderShape(.roundedRectangle)
-                    .buttonStyle(.borderedProminent)
-            }
-        )
-    }
-
-    private var noResults: some View {
-        ContentUnavailableView(
-            label: {
-                Text("Couldn't find \"\(query)\"")
-            }
-        )
-    }
-
-    private var list: some View {
-        ScrollView(.vertical) {
-            if categories.isEmpty {
-                noResults
-            } else {
+            ScrollView(.vertical) {
                 LazyVStack(spacing: 10) {
                     ForEach(categories, content: CategorySection.init)
                 }
             }
         }
-        .searchable(text: $query)
     }
+
 }
