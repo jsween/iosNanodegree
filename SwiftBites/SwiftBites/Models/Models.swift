@@ -47,7 +47,9 @@ final class Recipe {
 @Model
 final class RecipeIngredient {
     var quantity: String
-    var ingredient: Ingredient?
+    
+    @Relationship(deleteRule: .nullify)
+    var ingredient: Ingredient
 
     init(quantity: String, ingredient: Ingredient) {
         self.quantity = quantity
@@ -58,6 +60,9 @@ final class RecipeIngredient {
 @Model
 final class Ingredient {
     var name: String
+    
+    @Relationship(deleteRule: .cascade, inverse: \RecipeIngredient.ingredient)
+    var recipeIngredients: [RecipeIngredient] = []
 
     init(name: String) {
         self.name = name

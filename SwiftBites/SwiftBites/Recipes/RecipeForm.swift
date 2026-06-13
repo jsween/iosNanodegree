@@ -195,7 +195,7 @@ struct RecipeForm: View {
             } else {
                 ForEach(ingredients) { ingredient in
                     HStack(alignment: .center) {
-                        Text(ingredient.ingredient?.name ?? "Unknown")
+                        Text(ingredient.ingredient.name)
                             .bold()
                             .layoutPriority(2)
                         Spacer()
