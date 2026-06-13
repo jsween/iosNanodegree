@@ -1,82 +1,79 @@
 import SwiftUI
+import SwiftData
 
 struct CategoriesView: View {
-  @Environment(\.storage) private var storage
-  @State private var query = ""
+    @Environment(\.modelContext) private var context
+    @State private var query = ""
 
-  // MARK: - Body
+    @Query private var categories: [Category] = []
 
-  var body: some View {
-    NavigationStack {
-      content
-        .navigationTitle("Categories")
-        .toolbar {
-          if !storage.categories.isEmpty {
-            NavigationLink(value: CategoryForm.Mode.add) {
-              Label("Add", systemImage: "plus")
-            }
-          }
-        }
-        .navigationDestination(for: CategoryForm.Mode.self) { mode in
-          CategoryForm(mode: mode)
-        }
-        .navigationDestination(for: RecipeForm.Mode.self) { mode in
-          RecipeForm(mode: mode)
+    // MARK: - Body
+
+    var body: some View {
+        NavigationStack {
+            content
+                .navigationTitle("Categories")
+                .toolbar {
+                    if !categories.isEmpty {
+                        NavigationLink(value: CategoryForm.Mode.add) {
+                            Label("Add", systemImage: "plus")
+                        }
+                    }
+                }
+                .navigationDestination(for: CategoryForm.Mode.self) { mode in
+                    CategoryForm(mode: mode)
+                }
+                .navigationDestination(for: RecipeForm.Mode.self) { mode in
+                    RecipeForm(mode: mode)
+                }
         }
     }
-  }
 
-  // MARK: - Views
+    // MARK: - Views
 
-  @ViewBuilder
-  private var content: some View {
-    if storage.categories.isEmpty {
-      empty
-    } else {
-      list(for: storage.categories.filter {
-        if query.isEmpty {
-          return true
+    @ViewBuilder
+    private var content: some View {
+        if categories.isEmpty && query.isEmpty {
+            empty
         } else {
-          return $0.name.localizedStandardContains(query)
+            list
         }
-      })
     }
-  }
 
-  private var empty: some View {
-    ContentUnavailableView(
-      label: {
-        Label("No Categories", systemImage: "list.clipboard")
-      },
-      description: {
-        Text("Categories you add will appear here.")
-      },
-      actions: {
-        NavigationLink("Add Category", value: CategoryForm.Mode.add)
-          .buttonBorderShape(.roundedRectangle)
-          .buttonStyle(.borderedProminent)
-      }
-    )
-  }
+    private var empty: some View {
+        ContentUnavailableView(
+            label: {
+                Label("No Categories", systemImage: "list.clipboard")
+            },
+            description: {
+                Text("Categories you add will appear here.")
+            },
+            actions: {
+                NavigationLink("Add Category", value: CategoryForm.Mode.add)
+                    .buttonBorderShape(.roundedRectangle)
+                    .buttonStyle(.borderedProminent)
+            }
+        )
+    }
 
-  private var noResults: some View {
-    ContentUnavailableView(
-      label: {
-        Text("Couldn't find \"\(query)\"")
-      }
-    )
-  }
+    private var noResults: some View {
+        ContentUnavailableView(
+            label: {
+                Text("Couldn't find \"\(query)\"")
+            }
+        )
+    }
 
-  private func list(for categories: [MockCategory]) -> some View {
-    ScrollView(.vertical) {
-      if categories.isEmpty {
-        noResults
-      } else {
-        LazyVStack(spacing: 10) {
-          ForEach(categories, content: CategorySection.init)
+    private var list: some View {
+        ScrollView(.vertical) {
+            if categories.isEmpty {
+                noResults
+            } else {
+                LazyVStack(spacing: 10) {
+                    ForEach(categories, content: CategorySection.init)
+                }
+            }
         }
-      }
+        .searchable(text: $query)
     }
-    .searchable(text: $query)
-  }
 }
