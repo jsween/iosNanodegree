@@ -194,22 +194,24 @@ struct RecipeForm: View {
                 )
             } else {
                 ForEach(ingredients) { ingredient in
-                    HStack(alignment: .center) {
-                        Text(ingredient.ingredient.name)
-                            .bold()
-                            .layoutPriority(2)
-                        Spacer()
-                        TextField("Quantity", text: .init(
-                            get: {
-                                ingredient.quantity
-                            },
-                            set: { quantity in
-                                if let index = ingredients.firstIndex(where: { $0.id == ingredient.id }) {
-                                    ingredients[index].quantity = quantity
+                    if let ing = ingredient.ingredient {
+                        HStack(alignment: .center) {
+                            Text(ing.name)
+                                .bold()
+                                .layoutPriority(2)
+                            Spacer()
+                            TextField("Quantity", text: .init(
+                                get: {
+                                    ingredient.quantity
+                                },
+                                set: { quantity in
+                                    if let index = ingredients.firstIndex(where: { $0.id == ingredient.id }) {
+                                        ingredients[index].quantity = quantity
+                                    }
                                 }
-                            }
-                        ))
-                        .layoutPriority(1)
+                            ))
+                            .layoutPriority(1)
+                        }
                     }
                 }
                 .onDelete(perform: deleteIngredients)
