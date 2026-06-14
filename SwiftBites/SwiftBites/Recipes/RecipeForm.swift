@@ -50,6 +50,8 @@ struct RecipeForm: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
 
+    @State private var deletedIngredients: [RecipeIngredient] = []
+
     @Query private var categories: [Category]
 
     // MARK: - Body
@@ -264,11 +266,16 @@ struct RecipeForm: View {
 
     func deleteIngredients(offsets: IndexSet) {
         withAnimation {
+            let removed = offsets.map { ingredients[$0] }
+            deletedIngredients.append(contentsOf: removed)
             ingredients.remove(atOffsets: offsets)
         }
     }
 
     func save() {
+        for ingredient in deletedIngredients {
+            context.delete(ingredient)
+        }
         switch mode {
         case .add:
             let recipe = Recipe(
