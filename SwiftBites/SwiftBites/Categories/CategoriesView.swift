@@ -29,10 +29,9 @@ struct CategoriesView: View {
 private struct CategoryListView: View {
     @Query private var categories: [Category]
 
-    // TODO: convert both to lower to compare ITALIAN, ItaLian, or italian to Italian
     init(query: String) {
         let predicate = #Predicate<Category> { category in
-            query.isEmpty ? true : category.name.contains(query)
+            query.isEmpty ? true : category.name.localizedStandardContains(query)
         }
         _categories = Query(filter: predicate, animation: .default)
     }

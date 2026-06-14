@@ -43,7 +43,7 @@ private struct IngredientListView: View {
     init(query: String, selection: Selection? = nil) {
         self.selection = selection
         let predicate = #Predicate<Ingredient> { ingredient in
-            query.isEmpty ? true : ingredient.name.contains(query)
+            query.isEmpty ? true : ingredient.name.localizedStandardContains(query)
         }
         _ingredients = Query(filter: predicate, animation: .default)
     }

@@ -51,7 +51,7 @@ private struct RecipeListView: View {
 
     init(query: String, sortOrder: SortDescriptor<Recipe>) {
         let predicate = #Predicate<Recipe> { recipe in
-            query.isEmpty ? true : recipe.name.contains(query) || recipe.summary.contains(query)
+            query.isEmpty ? true : recipe.name.contains(query) || recipe.summary.localizedStandardContains(query)
         }
         _recipes = Query(filter: predicate, sort: [sortOrder], animation: .default)
     }
